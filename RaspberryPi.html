@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>EPICS on Raspberry Pi</title>
+<!-- 2015-07-21 Tue 08:57 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">EPICS on Raspberry Pi</h1>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Install notes</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Based on <a href="http://prjemian.github.io/epicspi/">http://prjemian.github.io/epicspi/</a><br  />
+  This assumes you have a clean install of raspbian (I'm using 2015-05-05)
+</p>
+</div>
+
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> EPICS Base</h3>
+<div class="outline-text-3" id="text-1-1">
+<ul class="org-ul">
+<li>Boot into raspbian and make sure you have a network connections
+</li>
+<li>Log in as user: pi
+</li>
+<li>Set up the date (if it's wrong!)
+<div class="org-src-container">
+
+<pre class="src src-sh">sudo dpkg-reconfigure tzdata
+</pre>
+</div>
+</li>
+<li>Make a new user: enge (make whatever you want for the password)
+<div class="org-src-container">
+
+<pre class="src src-sh">sudo adduser --home /home/enge enge
+</pre>
+</div>
+</li>
+<li>Add that user to the sudoers list
+<div class="org-src-container">
+
+<pre class="src src-sh">sudo adduser enge sudo
+</pre>
+</div>
+</li>
+<li>Log out and then in as that user
+</li>
+<li>Make the file structure
+<div class="org-src-container">
+
+<pre class="src src-sh">mkdir bin
+mkdir extensions
+mkdir project
+mkdir synApps
+</pre>
+</div>
+</li>
+<li>Download and untar the EPICS base package
+<pre class="example">
+wget http://www.aps.anl.gov/epics/download/base/base-3.15.2.tar.gz 
+tar -xzvf base-3.15.2.tar.gz
+ln -s base-3.15.2 base
+</pre>
+</li>
+<li>Paste the following into .bashrc
+<pre class="example">
+######################################################################
+##  EPICS
+######################################################################
+
+## Base
+export EPICS_ROOT=/home/enge
+export EPICS_BASE=${EPICS_ROOT}/base/
+export EPICS_HOST_ARCH=`${EPICS_BASE}/startup/EpicsHostArch`
+export EPICS_BASE_BIN=${EPICS_BASE}/bin/${EPICS_HOST_ARCH}
+export EPICS_BASE_LIB=${EPICS_BASE}/lib/${EPICS_HOST_ARCH}
+if [ "" = "${LD_LIBRARY_PATH}" ]; then
+    export LD_LIBRARY_PATH=${EPICS_BASE_LIB}
+else
+    export LD_LIBRARY_PATH=${EPICS_BASE_LIB}:${LD_LIBRARY_PATH}
+fi
+export PATH=${PATH}:${EPICS_BASE_BIN}
+
+## EPICS Extensions
+export EPICS_EXT=${EPICS_ROOT}/extensions
+export EPICS_EXT_BIN=${EPICS_EXT}/bin/${EPICS_HOST_ARCH}
+export EPICS_EXT_LIB=${EPICS_EXT}/lib/${EPICS_HOST_ARCH}
+if [ "" = "${LD_LIBRARY_PATH}" ]; then
+    export LD_LIBRARY_PATH=${EPICS_EXT_LIB}
+else
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${EPICS_BASE_LIB}
+fi
+export EPICS_SYNAPPS_BASE=${EPICS_ROOT}/synApps
+export EPICS_SYNAPPS_BIN=${EPICS_SYNAPPS_BASE}/support/utils
+export PATH=${PATH}:${EPICS_EXT_BIN}:${EPICS_SYNAPPS_BIN}
+</pre>
+</li>
+<li>Load it
+<pre class="example">
+source ~/.bashrc
+</pre>
+</li>
+<li>Compile EPICS
+<pre class="example">
+cd base
+make -j3
+</pre>
+</li>
+<li>Buy and drink some coffee
+</li>
+<li>Once finished, check that it works
+<pre class="example">
+softIoc
+</pre>
+</li>
+<li>Epics should have started. Now run the IOC
+<pre class="example">
+iocInit
+</pre>
+</li>
+<li>You should see something that looks like
+<pre class="example">
+epics&gt; iocInit  
+Starting iocInit
+############################################################################
+## EPICS R3.15.2 $Date: Thu 2015-05-14 14:09:28 +0200$
+## EPICS Base built Jul 17 2015
+############################################################################
+iocRun: All initialization complete
+epics&gt; exit
+</pre>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> synApps (needed for streamdevice and serial connections)</h3>
+<div class="outline-text-3" id="text-1-2">
+<ul class="org-ul">
+<li>Get the extensions and msi first
+<pre class="example">
+cd ~
+wget http://www.aps.anl.gov/epics/download/extensions/extensionsTop_20120904.tar.gz
+tar -xzvf extensionsTop_20120904.tar.gz
+wget http://www.aps.anl.gov/epics/download/extensions/msi1-7.tar.gz
+cd extensions/src
+tar -xzvf ../../msi1-7.tar.gz
+cd msi1-7
+make
+</pre>
+</li>
+<li>Install re2c (I don't know what it's for)
+<pre class="example">
+sudo apt-get install re2c
+</pre>
+</li>
+<li>Download and unzip synApps
+<pre class="example">
+cd ~
+wget http://www.aps.anl.gov/bcda/synApps/tar/synApps_5_8.tar.gz
+tar -xzvf synApps_5_8.tar.gz
+ln -s synApps_5_8 synApps
+</pre>
+</li>
+<li>We don't need all the junk included
+<pre class="example">
+cd synApps/support/configure
+emacs RELEASE
+</pre>
+</li>
+<li>Edit the SUPPORT line
+<pre class="example">
+SUPPORT=/home/enge/synApps/support
+</pre>
+</li>
+<li>Edit EPICS<sub>BASE</sub>
+<pre class="example">
+EPICS_BASE=/home/enge/base
+</pre>
+</li>
+<li>Comment out (with a '#') the modules we don't want
+<ul class="org-ul">
+<li><code>ALLEN_BRADLEY</code>
+</li>
+<li><code>AREA_DETECTOR</code>
+</li>
+<li><code>ADCORE</code>
+</li>
+<li><code>ADBINARIES</code>
+</li>
+<li><code>CAPUTRECORDER</code>
+</li>
+<li><code>CAMAC</code>
+</li>
+<li><code>DAC128V</code>
+</li>
+<li><code>DXP</code>
+</li>
+<li><code>IP</code>
+</li>
+<li><code>IP330</code>
+</li>
+<li><code>IPUNIDIG</code>
+</li>
+<li><code>OPTICS</code>
+</li>
+<li><code>QUADEM</code>
+</li>
+<li><code>SOFTGLUE</code>
+</li>
+<li><code>VME</code>
+</li>
+</ul>
+</li>
+<li>Prepare the makefile
+<pre class="example">
+cd ~/synApps/support
+make release
+</pre>
+</li>
+<li>Compile!
+<pre class="example">
+make -j3 rebuild
+</pre>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> Tidy up</h3>
+<div class="outline-text-3" id="text-1-3">
+<ul class="org-ul">
+<li>Make a folder to keep zip files
+<div class="org-src-container">
+
+<pre class="src src-sh"><span style="color: #b0c4de;">cd</span> ~
+mkdir download
+mv *.tar.gz download
+</pre>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2015-07-14</p>
+<p class="date">Created: 2015-07-21 Tue 08:57</p>
+<p class="creator">Emacs 24.3.1 (Org mode 8.2.4)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

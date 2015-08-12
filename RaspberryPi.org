@@ -1,0 +1,182 @@
+#+TITLE: EPICS on Raspberry Pi
+#+DATE: <2015-07-14 Tue>
+#+AUTHOR: Richard Longland
+#+EMAIL: longland@X1Carbon
+#+OPTIONS: ':nil *:t -:t ::t <:t H:2 \n:nil ^:t arch:headline
+#+OPTIONS: author:nil c:nil creator:comment d:nil date:t e:t email:nil
+#+OPTIONS: f:t inline:t num:t p:nil pri:nil stat:t tags:not-in-toc
+#+OPTIONS: tasks:t tex:t timestamp:t toc:nil todo:t |:t
+#+CREATOR: Emacs 24.3.1 (Org mode 8.2.4)
+#+DESCRIPTION:
+#+EXCLUDE_TAGS: noexport
+#+KEYWORDS:
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+LATEX_HEADER: \usepackage{fullpage}
+#+LATEX_HEADER: \usepackage{times}
+
+* Install notes
+  Based on http://prjemian.github.io/epicspi/\\
+  This assumes you have a clean install of raspbian (I'm using 2015-05-05)
+
+** EPICS Base
+   + Boot into raspbian and make sure you have a network connections
+   + Log in as user: pi
+   + Set up the date (if it's wrong!)
+     #+BEGIN_SRC sh
+     sudo dpkg-reconfigure tzdata
+     #+END_SRC
+   + Make a new user: enge (make whatever you want for the password)
+     #+BEGIN_SRC sh
+     sudo adduser --home /home/enge enge
+     #+END_SRC
+   + Add that user to the sudoers list
+     #+BEGIN_SRC sh
+     sudo adduser enge sudo
+     #+END_SRC
+   + Log out and then in as that user
+   + Make the file structure
+     #+BEGIN_SRC sh
+mkdir bin
+mkdir extensions
+mkdir project
+mkdir synApps
+     #+END_SRC
+   + Download and untar the EPICS base package
+     #+BEGIN_SRC 
+wget http://www.aps.anl.gov/epics/download/base/base-3.15.2.tar.gz 
+tar -xzvf base-3.15.2.tar.gz
+ln -s base-3.15.2 base
+     #+END_SRC
+   + Paste the following into .bashrc
+     #+BEGIN_SRC 
+######################################################################
+##  EPICS
+######################################################################
+
+## Base
+export EPICS_ROOT=/home/enge
+export EPICS_BASE=${EPICS_ROOT}/base/
+export EPICS_HOST_ARCH=`${EPICS_BASE}/startup/EpicsHostArch`
+export EPICS_BASE_BIN=${EPICS_BASE}/bin/${EPICS_HOST_ARCH}
+export EPICS_BASE_LIB=${EPICS_BASE}/lib/${EPICS_HOST_ARCH}
+if [ "" = "${LD_LIBRARY_PATH}" ]; then
+    export LD_LIBRARY_PATH=${EPICS_BASE_LIB}
+else
+    export LD_LIBRARY_PATH=${EPICS_BASE_LIB}:${LD_LIBRARY_PATH}
+fi
+export PATH=${PATH}:${EPICS_BASE_BIN}
+
+## EPICS Extensions
+export EPICS_EXT=${EPICS_ROOT}/extensions
+export EPICS_EXT_BIN=${EPICS_EXT}/bin/${EPICS_HOST_ARCH}
+export EPICS_EXT_LIB=${EPICS_EXT}/lib/${EPICS_HOST_ARCH}
+if [ "" = "${LD_LIBRARY_PATH}" ]; then
+    export LD_LIBRARY_PATH=${EPICS_EXT_LIB}
+else
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${EPICS_BASE_LIB}
+fi
+export EPICS_SYNAPPS_BASE=${EPICS_ROOT}/synApps
+export EPICS_SYNAPPS_BIN=${EPICS_SYNAPPS_BASE}/support/utils
+export PATH=${PATH}:${EPICS_EXT_BIN}:${EPICS_SYNAPPS_BIN}
+     #+END_SRC
+   + Load it
+     #+BEGIN_SRC 
+source ~/.bashrc
+     #+END_SRC
+   + Compile EPICS
+     #+BEGIN_SRC 
+cd base
+make -j3     
+     #+END_SRC
+   + Buy and drink some coffee
+   + Once finished, check that it works
+     #+BEGIN_SRC 
+softIoc     
+     #+END_SRC
+   + Epics should have started. Now run the IOC
+     #+BEGIN_SRC 
+iocInit     
+     #+END_SRC
+   + You should see something that looks like
+     #+BEGIN_SRC 
+epics> iocInit  
+Starting iocInit
+############################################################################
+## EPICS R3.15.2 $Date: Thu 2015-05-14 14:09:28 +0200$
+## EPICS Base built Jul 17 2015
+############################################################################
+iocRun: All initialization complete
+epics> exit     
+     #+END_SRC
+
+** synApps (needed for streamdevice and serial connections)
+   + Get the extensions and msi first
+     #+BEGIN_SRC 
+cd ~
+wget http://www.aps.anl.gov/epics/download/extensions/extensionsTop_20120904.tar.gz
+tar -xzvf extensionsTop_20120904.tar.gz
+wget http://www.aps.anl.gov/epics/download/extensions/msi1-7.tar.gz
+cd extensions/src
+tar -xzvf ../../msi1-7.tar.gz
+cd msi1-7
+make
+     #+END_SRC
+   + Install re2c (I don't know what it's for)
+     #+BEGIN_SRC 
+sudo apt-get install re2c     
+     #+END_SRC
+   + Download and unzip synApps
+     #+BEGIN_SRC 
+cd ~
+wget http://www.aps.anl.gov/bcda/synApps/tar/synApps_5_8.tar.gz
+tar -xzvf synApps_5_8.tar.gz
+ln -s synApps_5_8 synApps
+     #+END_SRC
+   + We don't need all the junk included
+     #+BEGIN_SRC 
+cd synApps/support/configure
+emacs RELEASE     
+     #+END_SRC
+   + Edit the SUPPORT line
+     #+BEGIN_SRC 
+SUPPORT=/home/enge/synApps/support
+     #+END_SRC
+   + Edit EPICS_BASE
+     #+BEGIN_SRC 
+EPICS_BASE=/home/enge/base
+     #+END_SRC
+   + Comment out (with a '#') the modules we don't want
+     - ~ALLEN_BRADLEY~
+     - ~AREA_DETECTOR~
+     - ~ADCORE~
+     - ~ADBINARIES~
+     - ~CAPUTRECORDER~
+     - ~CAMAC~
+     - ~DAC128V~
+     - ~DXP~
+     - ~IP~
+     - ~IP330~
+     - ~IPUNIDIG~
+     - ~OPTICS~
+     - ~QUADEM~
+     - ~SOFTGLUE~
+     - ~VME~
+   + Prepare the makefile
+     #+BEGIN_SRC 
+cd ~/synApps/support
+make release     
+     #+END_SRC
+   + Compile!
+     #+BEGIN_SRC 
+make -j3 rebuild     
+     #+END_SRC
+
+** Tidy up
+   + Make a folder to keep zip files
+     #+BEGIN_SRC sh
+cd ~
+mkdir download
+mv *.tar.gz download
+     #+END_SRC
+     

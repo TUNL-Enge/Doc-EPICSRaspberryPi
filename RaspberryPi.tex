@@ -1,0 +1,206 @@
+% Created 2015-07-21 Tue 08:57
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\usepackage{fullpage}
+\usepackage{times}
+\date{2015-07-14}
+\title{EPICS on Raspberry Pi}
+\hypersetup{
+  pdfkeywords={},
+  pdfsubject={},
+  pdfcreator={Emacs 24.3.1 (Org mode 8.2.4)}}
+\begin{document}
+
+\maketitle
+
+\section{Install notes}
+\label{sec-1}
+Based on \url{http://prjemian.github.io/epicspi/}\\
+  This assumes you have a clean install of raspbian (I'm using 2015-05-05)
+
+\subsection{EPICS Base}
+\label{sec-1-1}
+\begin{itemize}
+\item Boot into raspbian and make sure you have a network connections
+\item Log in as user: pi
+\item Set up the date (if it's wrong!)
+\begin{verbatim}
+sudo dpkg-reconfigure tzdata
+\end{verbatim}
+\item Make a new user: enge (make whatever you want for the password)
+\begin{verbatim}
+sudo adduser --home /home/enge enge
+\end{verbatim}
+\item Add that user to the sudoers list
+\begin{verbatim}
+sudo adduser enge sudo
+\end{verbatim}
+\item Log out and then in as that user
+\item Make the file structure
+\begin{verbatim}
+mkdir bin
+mkdir extensions
+mkdir project
+mkdir synApps
+\end{verbatim}
+\item Download and untar the EPICS base package
+\begin{verbatim}
+wget http://www.aps.anl.gov/epics/download/base/base-3.15.2.tar.gz 
+tar -xzvf base-3.15.2.tar.gz
+ln -s base-3.15.2 base
+\end{verbatim}
+\item Paste the following into .bashrc
+\begin{verbatim}
+######################################################################
+##  EPICS
+######################################################################
+
+## Base
+export EPICS_ROOT=/home/enge
+export EPICS_BASE=${EPICS_ROOT}/base/
+export EPICS_HOST_ARCH=`${EPICS_BASE}/startup/EpicsHostArch`
+export EPICS_BASE_BIN=${EPICS_BASE}/bin/${EPICS_HOST_ARCH}
+export EPICS_BASE_LIB=${EPICS_BASE}/lib/${EPICS_HOST_ARCH}
+if [ "" = "${LD_LIBRARY_PATH}" ]; then
+    export LD_LIBRARY_PATH=${EPICS_BASE_LIB}
+else
+    export LD_LIBRARY_PATH=${EPICS_BASE_LIB}:${LD_LIBRARY_PATH}
+fi
+export PATH=${PATH}:${EPICS_BASE_BIN}
+
+## EPICS Extensions
+export EPICS_EXT=${EPICS_ROOT}/extensions
+export EPICS_EXT_BIN=${EPICS_EXT}/bin/${EPICS_HOST_ARCH}
+export EPICS_EXT_LIB=${EPICS_EXT}/lib/${EPICS_HOST_ARCH}
+if [ "" = "${LD_LIBRARY_PATH}" ]; then
+    export LD_LIBRARY_PATH=${EPICS_EXT_LIB}
+else
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${EPICS_BASE_LIB}
+fi
+export EPICS_SYNAPPS_BASE=${EPICS_ROOT}/synApps
+export EPICS_SYNAPPS_BIN=${EPICS_SYNAPPS_BASE}/support/utils
+export PATH=${PATH}:${EPICS_EXT_BIN}:${EPICS_SYNAPPS_BIN}
+\end{verbatim}
+\item Load it
+\begin{verbatim}
+source ~/.bashrc
+\end{verbatim}
+\item Compile EPICS
+\begin{verbatim}
+cd base
+make -j3
+\end{verbatim}
+\item Buy and drink some coffee
+\item Once finished, check that it works
+\begin{verbatim}
+softIoc
+\end{verbatim}
+\item Epics should have started. Now run the IOC
+\begin{verbatim}
+iocInit
+\end{verbatim}
+\item You should see something that looks like
+\begin{verbatim}
+epics> iocInit  
+Starting iocInit
+############################################################################
+## EPICS R3.15.2 $Date: Thu 2015-05-14 14:09:28 +0200$
+## EPICS Base built Jul 17 2015
+############################################################################
+iocRun: All initialization complete
+epics> exit
+\end{verbatim}
+\end{itemize}
+\subsection{synApps (needed for streamdevice and serial connections)}
+\label{sec-1-2}
+\begin{itemize}
+\item Get the extensions and msi first
+\begin{verbatim}
+cd ~
+wget http://www.aps.anl.gov/epics/download/extensions/extensionsTop_20120904.tar.gz
+tar -xzvf extensionsTop_20120904.tar.gz
+wget http://www.aps.anl.gov/epics/download/extensions/msi1-7.tar.gz
+cd extensions/src
+tar -xzvf ../../msi1-7.tar.gz
+cd msi1-7
+make
+\end{verbatim}
+\item Install re2c (I don't know what it's for)
+\begin{verbatim}
+sudo apt-get install re2c
+\end{verbatim}
+\item Download and unzip synApps
+\begin{verbatim}
+cd ~
+wget http://www.aps.anl.gov/bcda/synApps/tar/synApps_5_8.tar.gz
+tar -xzvf synApps_5_8.tar.gz
+ln -s synApps_5_8 synApps
+\end{verbatim}
+\item We don't need all the junk included
+\begin{verbatim}
+cd synApps/support/configure
+emacs RELEASE
+\end{verbatim}
+\item Edit the SUPPORT line
+\begin{verbatim}
+SUPPORT=/home/enge/synApps/support
+\end{verbatim}
+\item Edit EPICS$_{\text{BASE}}$
+\begin{verbatim}
+EPICS_BASE=/home/enge/base
+\end{verbatim}
+\item Comment out (with a '\#') the modules we don't want
+\begin{itemize}
+\item \verb~ALLEN_BRADLEY~
+\item \verb~AREA_DETECTOR~
+\item \verb~ADCORE~
+\item \verb~ADBINARIES~
+\item \verb~CAPUTRECORDER~
+\item \verb~CAMAC~
+\item \verb~DAC128V~
+\item \verb~DXP~
+\item \verb~IP~
+\item \verb~IP330~
+\item \verb~IPUNIDIG~
+\item \verb~OPTICS~
+\item \verb~QUADEM~
+\item \verb~SOFTGLUE~
+\item \verb~VME~
+\end{itemize}
+\item Prepare the makefile
+\begin{verbatim}
+cd ~/synApps/support
+make release
+\end{verbatim}
+\item Compile!
+\begin{verbatim}
+make -j3 rebuild
+\end{verbatim}
+\end{itemize}
+\subsection{Tidy up}
+\label{sec-1-3}
+\begin{itemize}
+\item Make a folder to keep zip files
+\begin{verbatim}
+cd ~
+mkdir download
+mv *.tar.gz download
+\end{verbatim}
+\end{itemize}
+% Emacs 24.3.1 (Org mode 8.2.4)
+\end{document}
