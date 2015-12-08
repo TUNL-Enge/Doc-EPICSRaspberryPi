@@ -44,9 +44,9 @@ mkdir synApps
      #+END_SRC
    + Download and untar the EPICS base package
      #+BEGIN_SRC 
-wget http://www.aps.anl.gov/epics/download/base/base-3.15.2.tar.gz 
-tar -xzvf base-3.15.2.tar.gz
-ln -s base-3.15.2 base
+wget http://www.aps.anl.gov/epics/download/base/base-3.15.3.tar.gz 
+tar -xzvf base-3.15.3.tar.gz
+ln -s base-3.15.3 base
      #+END_SRC
    + Paste the following into .bashrc
      #+BEGIN_SRC 
@@ -103,7 +103,7 @@ iocInit
 epics> iocInit  
 Starting iocInit
 ############################################################################
-## EPICS R3.15.2 $Date: Thu 2015-05-14 14:09:28 +0200$
+## EPICS R3.15.3 $Date: Thu 2015-05-14 14:09:28 +0200$
 ## EPICS Base built Jul 17 2015
 ############################################################################
 iocRun: All initialization complete
@@ -155,8 +155,6 @@ EPICS_BASE=/home/enge/base
      - ~CAMAC~
      - ~DAC128V~
      - ~DXP~
-     - ~IP~
-     - ~IP330~
      - ~IPUNIDIG~
      - ~OPTICS~
      - ~QUADEM~
