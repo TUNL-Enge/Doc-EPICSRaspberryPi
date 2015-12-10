@@ -33,6 +33,7 @@
    + Add that user to the sudoers list
      #+BEGIN_SRC sh
      sudo adduser enge sudo
+     sudo adduser enge dialout
      #+END_SRC
    + Log out and then in as that user
    + Make the file structure

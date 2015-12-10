@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>EPICS on Raspberry Pi</title>
-<!-- 2015-07-21 Tue 08:57 -->
+<!-- 2015-12-10 Thu 07:55 -->
 <meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta  name="generator" content="Org-mode" />
 <style type="text/css">
@@ -171,6 +171,7 @@ Based on <a href="http://prjemian.github.io/epicspi/">http://prjemian.github.io/
 <div class="org-src-container">
 
 <pre class="src src-sh">sudo adduser enge sudo
+sudo adduser enge dialout
 </pre>
 </div>
 </li>
@@ -188,9 +189,9 @@ mkdir synApps
 </li>
 <li>Download and untar the EPICS base package
 <pre class="example">
-wget http://www.aps.anl.gov/epics/download/base/base-3.15.2.tar.gz 
-tar -xzvf base-3.15.2.tar.gz
-ln -s base-3.15.2 base
+wget http://www.aps.anl.gov/epics/download/base/base-3.15.3.tar.gz 
+tar -xzvf base-3.15.3.tar.gz
+ln -s base-3.15.3 base
 </pre>
 </li>
 <li>Paste the following into .bashrc
@@ -254,7 +255,7 @@ iocInit
 epics&gt; iocInit  
 Starting iocInit
 ############################################################################
-## EPICS R3.15.2 $Date: Thu 2015-05-14 14:09:28 +0200$
+## EPICS R3.15.3 $Date: Thu 2015-05-14 14:09:28 +0200$
 ## EPICS Base built Jul 17 2015
 ############################################################################
 iocRun: All initialization complete
@@ -327,10 +328,6 @@ EPICS_BASE=/home/enge/base
 </li>
 <li><code>DXP</code>
 </li>
-<li><code>IP</code>
-</li>
-<li><code>IP330</code>
-</li>
 <li><code>IPUNIDIG</code>
 </li>
 <li><code>OPTICS</code>
@@ -377,7 +374,7 @@ mv *.tar.gz download
 </div>
 <div id="postamble" class="status">
 <p class="date">Date: 2015-07-14</p>
-<p class="date">Created: 2015-07-21 Tue 08:57</p>
+<p class="date">Created: 2015-12-10 Thu 07:55</p>
 <p class="creator">Emacs 24.3.1 (Org mode 8.2.4)</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
